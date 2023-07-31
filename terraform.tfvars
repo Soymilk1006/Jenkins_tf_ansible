@@ -1,0 +1,8 @@
+subnet_cidr_block="10.0.32.0/24"
+vpc_block="10.0.0.0/16"
+availability_zone="ap-southeast-1c"
+env_prefix="dev"
+my_ip="0.0.0.0/0"
+ec2_instance_type="t2.micro"
+public_key_location ="c:/Users/Administrator/.ssh/id_ed25519.pub"
+entry-script="entry-script.sh"
