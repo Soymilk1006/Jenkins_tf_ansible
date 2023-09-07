@@ -29,7 +29,8 @@ resource "aws_instance" "myapp-server" {
     #   "export ENV=dev",
     #   "mkdir newdir"
     #  ]
-    script = file(var.entry-script)
+    
+   # script = file(var.entry-script)
 
   }
 
