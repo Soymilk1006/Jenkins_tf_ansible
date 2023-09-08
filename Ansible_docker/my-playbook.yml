@@ -1,0 +1,91 @@
+---
+- name: Wait for ssh reset_connection
+  hosts: all
+  gather_facts: False
+  tasks:
+    - name: Ensure ssh port open
+      wait_for:
+        port: 22
+        delay: 10
+        timeout: 100
+        search_regex: OpenSSH
+        host: "{{ (ansible_ssh_host|default(ansible_host))|default(inventory_hostname) }}"
+        vars:
+          ansible_connection: local
+
+- name: Log in as root and set up enviorment
+  hosts: aws_ec2 # Replace with the appropriate group or hostname
+  gather_facts: no # Disable gathering facts, as we're logging in as root
+  become: yes # Enable privilege escalation
+  vars_files:
+    - project-vars
+  tasks:
+    - name: Execute a command as root
+      command: whoami # Replace with the command you want to run
+      register: result
+
+    - name: Display the command output
+      debug:
+        var: result.stdout
+
+    - name: update Yum repo and cache
+      yum: update_cache=yes
+    - name: Install python3 (if python3 is not installed by default)and Docker
+      yum:
+        name:
+          - python3-pip
+          - docker
+        state: present
+    - name: install docker compose
+      get_url:
+        url: https://github.com/docker/compose/releases/download/v2.20.3/docker-compose-Linux-{{lookup('pipe', 'uname -m')}}
+        dest: /usr/local/bin/docker-compose
+        mode: +x
+    - name: Start docker
+      systemd:
+        name: docker
+        state: started
+
+- name: Add ec2-user to docker group and test docker pull
+  hosts: aws_ec2
+  become: yes
+  tasks:
+    - name: Add ec2-user to docker group
+      user:
+        name: ec2-user
+        groups: docker
+        append: yes
+
+    - name: Reconnect to server session
+      meta: reset_connection
+
+    - name: test docker pull redis
+      docker_image:
+        name: redis
+        source: pull
+
+- name: Start docker containers
+  hosts: aws_ec2
+  vars_prompt:
+    - name: docker_password
+      prompt: Enter password for docker registry
+  tasks:
+    - name: Copy docker compose file from ansible server to ec2 server
+      copy:
+        src: /home/ec2-user/Ansible_docker/docker-compose.yml
+        dest: /home/ec2-user/docker-compose.yml
+    - name: Docker login
+      docker_login:
+        registry_url: https://index.docker.io/v1
+        username: legendlight
+        password: "{{docker_password}}"
+    - name: Install python related Docker and Docker-compose
+      pip:
+        name:
+          - docker
+          - docker-compose
+
+    - name: Start container from compose
+      community.docker.docker_compose:
+        project_src: /home/ec2-user
+        state: present
