@@ -13,6 +13,7 @@ provider "aws" {
 
 resource "aws_vpc" "development-vpc" {
   cidr_block = var.vpc_block
+  enable_dns_hostname = true
   tags = {
     Name : "${var.env_prefix}-vpc"
   }

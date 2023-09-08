@@ -51,8 +51,8 @@ resource "null_resource" "configure_server" {
   
   provisioner "local-exec" {
     working_dir = "${var.work_home}/Ansible_docker"
-    command = "ansible-playbook --inventory ${aws_instance.myapp-server.public_ip}, --private-key ${var.private_key_location} --user ec2-user ansible_deploy.yml"
-
+    #command = "ansible-playbook --inventory ${aws_instance.myapp-server.public_ip}, --private-key ${var.private_key_location} --user ec2-user ansible_deploy.yml"
+    command = "ansible-playbook -i inventory_aws_ec2.yml ansible_deploy.yml"
   }
 
 }
