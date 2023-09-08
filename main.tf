@@ -71,7 +71,7 @@ resource "aws_default_security_group" "myapp-default-sg" {
 
 
 module "myapp-subnet" {
- source="./moudles/subnet"
+ source="./modules/subnet"
  vpc_id = aws_vpc.development-vpc.id
  default_route_table_id = aws_vpc.development-vpc.default_route_table_id
  env_prefix = var.env_prefix
@@ -80,7 +80,7 @@ module "myapp-subnet" {
 } 
 
 module "webserver" {
-  source="./moudles/webserver"
+  source="./modules/webserver"
   vpc_id = aws_vpc.development-vpc.id
   my_ip= var.my_ip
   env_prefix = var.env_prefix
@@ -91,6 +91,7 @@ module "webserver" {
   private_key_location=var.private_key_location
   entry-script= var.entry-script
   myapp-default-sg_id=aws_default_security_group.myapp-default-sg.id
+  work_home=var.work_home
 
 }
 

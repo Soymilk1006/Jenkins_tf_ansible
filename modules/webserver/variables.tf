@@ -8,3 +8,5 @@ variable public_key_location {}
 variable private_key_location {}
 variable entry-script {}
 variable myapp-default-sg_id {}
+variable work_home {}
+

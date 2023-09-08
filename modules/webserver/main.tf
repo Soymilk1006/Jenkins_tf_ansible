@@ -13,18 +13,19 @@ resource "aws_instance" "myapp-server" {
   # user_data = file(var.entry-script)
   # user_data_replace_on_change = true 
 
-  connection {
-    type        = "ssh"
-    host        = self.public_ip
-    user        = "ec2-user"
-    private_key = file(var.private_key_location)
-  }
+  # connection {
+  #   type        = "ssh"
+  #   host        = self.public_ip
+  #   user        = "ec2-user"
+  #   private_key = file(var.private_key_location)
+  # }
 
-  provisioner "file" {
-    source      = var.entry-script
-    destination = "/home/ec2-user/${var.entry-script}"
-  }
-  provisioner "remote-exec" {
+  # provisioner "file" {
+  #   source      = var.entry-script
+  #   destination = "/home/ec2-user/${var.entry-script}"
+  # }
+
+  #provisioner "remote-exec" {
     # inline = [ 
     #   "export ENV=dev",
     #   "mkdir newdir"
@@ -32,15 +33,26 @@ resource "aws_instance" "myapp-server" {
     
    # script = file(var.entry-script)
 
-  }
-
-  provisioner "local-exec" {
-    command = "echo ${self.public_ip} > output.txt"
-
-  }
+  #}
 
   tags = {
     Name = "${var.env_prefix}-server"
+  }
+
+}
+
+resource "null_resource" "configure_server" {
+    # Execute ansible to configure ec2
+  # ec2 instance may not be fully created before execute ansilbe command
+
+  triggers = {
+    trigger = aws_instance.myapp-server.public_ip
+  }
+  
+  provisioner "local-exec" {
+    working_dir = "${var.work_home}/Ansible_docker"
+    command = "ansible-playbook --inventory ${aws_instance.myapp-server.public_ip}, --private-key ${var.private_key_location} --user ec2-user ansible_deploy.yml"
+
   }
 
 }

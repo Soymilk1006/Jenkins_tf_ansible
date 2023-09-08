@@ -39,3 +39,7 @@ variable "entry-script" {
 variable "private_key_location" {
 
 }
+
+variable "work_home" {
+  
+}
