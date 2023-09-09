@@ -1,4 +1,18 @@
 ---
+- name: Wait for ssh reset_connection
+  hosts: all
+  gather_facts: False
+  tasks:
+    - name: Ensure ssh port open
+      wait_for:
+        port: 22
+        delay: 10
+        timeout: 100
+        search_regex: OpenSSH
+        host: "{{ (ansible_ssh_host|default(ansible_host))|default(inventory_hostname) }}"
+        vars:
+          ansible_connection: local
+
 - name: Log in as root and set up enviorment
   hosts: all # Replace with the appropriate group or hostname
   gather_facts: no # Disable gathering facts, as we're logging in as root
