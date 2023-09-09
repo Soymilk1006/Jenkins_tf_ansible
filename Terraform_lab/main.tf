@@ -5,7 +5,7 @@
 # export AWS_SECRET_ACCESS_KEY=your_secret_access_key
 # export AWS_DEFAULT_REGION=us-west-2
 provider "aws" {
-  region = "ap-southeast-1"
+  region = "ap-southeast-2"
 
 }
 
@@ -13,7 +13,7 @@ provider "aws" {
 
 resource "aws_vpc" "development-vpc" {
   cidr_block = var.vpc_block
-  enable_dns_hostname = true
+  enable_dns_hostnames = true
   tags = {
     Name : "${var.env_prefix}-vpc"
   }

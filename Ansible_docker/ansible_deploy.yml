@@ -51,15 +51,11 @@
 - name: Start docker containers
   hosts: all
   become: yes
-  become_user: "{{new_user}}"
+  become_user: ansible_user
   vars_prompt:
     - name: docker_password
       prompt: Enter password for docker registry
   tasks:
-    - name: Copy docker compose file from ansible server to ec2 server
-      copy:
-        src: /home/ec2-user/Ansible_docker/docker-compose.yml
-        dest: "/home/{{new_user}}/docker-compose.yml"
     - name: Docker login
       docker_login:
         registry_url: https://index.docker.io/v1
